@@ -1,0 +1,11 @@
+#ifndef Token_h
+#define Token_h
+
+#include <ArdOSC.h>
+#include <ESP8266WiFi.h>
+
+class Token {
+public:
+	Token();
+};
+#endif
