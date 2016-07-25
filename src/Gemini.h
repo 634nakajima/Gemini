@@ -3,7 +3,7 @@
 
 #include <ArdOSC.h>
 #include <ESP8266WiFi.h>
-#include "Token.h"
+#include <WiFiUdp.h>
 
 //tokenのosc	アドレスは，
 //（コーディネータIP）/（Geminiネーム）/（番号）
@@ -13,10 +13,10 @@ public:
 	Gemini();
 	~Gemini();
 	
-	void begin();
+	void begin(const char *ssid, const char *password);
 	void monitor();
-	void output(int_16 v);
-	int input();
+	void sendOutput(int v);
+	int getInput();
 	void sendInfo();
 	void sendInitTokenReq();
 	void sendDelTokenReq();
@@ -29,7 +29,7 @@ private:
 	OSCDecoder decorder;
 	OSCEncoder encoder;
 	Pattern parser;
-	int_16 input, output;
+	int input, output;
 	void addFunc();
 	void infoReqReceved(OSCMessage *_mes);
 	void initReqReceved(OSCMessage *_mes);

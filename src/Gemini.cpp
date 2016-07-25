@@ -6,14 +6,15 @@ Gemini::Gemini(){
 Gemini::~Gemini(){
 }
 
-void Gemini::begin(){
-	/*WiFi.mode(WIFI_STA);
+void Gemini::begin(const char *ssid, const char *password){
+	WiFi.mode(WIFI_STA);
   	WiFi.begin(ssid, password);
+    Serial.begin(115200);
   	while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     	Serial.println("Connection Failed! Rebooting...");
     	delay(5000);
     	ESP.restart();
-  	}*/
+  	}
 	udp.begin(6340);
 	server.begin();
 }
@@ -40,10 +41,10 @@ void Gemini::monitor(){
 	}
 }
 
-void Gemini::output(int_16 v){
+void Gemini::sendOutput(int v){
 }
 
-int_16 Gemini::input(){
+int_16 Gemini::getInput(){
 }
 
 void Gemini::sendInfo(){
