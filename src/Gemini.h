@@ -24,9 +24,8 @@ public:
 private:
 	WiFiUDP udp;
 	WiFiClient client;
-	WiFiServer server(6341);
 
-	OSCDecoder decorder;
+	OSCDecoder decoder;
 	OSCEncoder encoder;
 	Pattern parser;
 	int input, output;

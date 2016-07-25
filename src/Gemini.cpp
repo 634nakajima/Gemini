@@ -1,6 +1,9 @@
-#include "Gemini.h"
+#include <Gemini.h>
+
+WiFiServer server(6341);
 
 Gemini::Gemini(){
+    input = 0;
 }
 
 Gemini::~Gemini(){
@@ -27,17 +30,17 @@ void Gemini::monitor(){
 		}
 		OSCMessage mes;
 		char packet[512];
-		client.read((char *)packet, sizeof(long)*100);
+		//client.read((char *)packet, sizeof(long)*100);
 		decoder.decode(&mes, packet);
 		parser.patternComp(&mes);
   		client.flush();
 	}
 
-	packetSize = udp.parsePacket();
+	int packetSize = udp.parsePacket();
 	if (packetSize){
 		udp.read((char *)packet, sizeof(long)*100);
 		decoder.decode(&mes, packet);
-		parser.patternComp(&mes);
+		parser.paternComp(&mes);
 	}
 }
 
