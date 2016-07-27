@@ -34,14 +34,24 @@ void Pattern::addOscAddress(char *_adr ,  AdrFunc _func){
     patternNum++;
 }
 
+void Pattern::addOscAddress(char *_adr ,  inputCallback _func){
+    inputCb[patternNum] = _func;
+    addr[patternNum] = _adr;
+    patternNum++;
+}
+
 void Pattern::execFunc(uint8_t _index,OSCMessage *_mes){
     adrFunc[_index](_mes);
+}
+
+void Pattern::execFunc(uint8_t _index, int v){
+    inputCb[_index](v);
 }
 
 void Pattern::patternComp(OSCMessage *_mes){
     
     for (uint8_t i=0 ; i<patternNum ; i++) {
-        if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 ) execFunc( i , _mes );
+        if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 ) execFunc( i , _mes->getArgInt32(0));
 
     }
 }

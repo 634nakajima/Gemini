@@ -28,7 +28,7 @@ void Gemini::monitor(){
     uint8_t packet[512];
     
 	if (client) {
-		while(!client.available()){
+	  while(!client.available()){
 			delay(1);
 		}
 		//client.read((char *)packet, sizeof(long)*100);
@@ -45,7 +45,19 @@ void Gemini::monitor(){
 	}
 }
 
-void Gemini::sendOutput(int v){
+int Gemini::addInput(const char *inAddr, int inputPin){
+  return parser.patternNum;
+}
+int Gemini::addInput(const char *inAddr, void (*inputCallback)(int)){
+  //perserにinAddrでコールバック登録
+  parser.addOscAddress((char *)inAddr, inputCallback);
+  return parser.patternNum;
+}
+
+int Gemini::addOutput(const char *outAddr) {
+  return 0;
+}
+void Gemini::send(int outputID, int v){
 }
 
 int Gemini::getInput(){
@@ -60,18 +72,25 @@ void Gemini::sendInitTokenReq(){
 void Gemini::sendDelTokenReq(){
 }
 
+//addCallback関数ではコーディネータからのリクエスト受信時，及び他モジュールからのデータ受信時に呼び出されるコールバック関数を登録
 void Gemini::addFunc(){
 }
 
+
 void Gemini::infoReqReceved(OSCMessage *_mes){
+  //モジュールリストの送信
+  sendInfo();
 }
 
 void Gemini::initReqReceved(OSCMessage *_mes){
+  //モジュールの生成
 }
 
 void Gemini::delReqReceved(OSCMessage *_mes){
+  //モジュールの削除
 }
 
 void Gemini::dataReceived(OSCMessage *_mes){
+  //コールバック呼び出し
 }
 

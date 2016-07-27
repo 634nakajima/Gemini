@@ -19,7 +19,7 @@
 #define OSCMessage_h
 
 #include "OSCArg.h"
-#include "OSCCommon.h"
+#include "OSCcommon.h"
 
 #define kTagInt32   'i'
 #define kTagFloat   'f'

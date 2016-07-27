@@ -1,7 +1,6 @@
 #ifndef OSCDecoder_h
 #define OSCDecoder_h
 
-
 #include "OSCMessage.h"
 
 class OSCDecoder{
