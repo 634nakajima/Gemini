@@ -24,12 +24,13 @@ void Gemini::begin(const char *ssid, const char *password){
 
 void Gemini::monitor(){
 	WiFiClient client = server.available();
+    OSCMessage mes;
+    uint8_t packet[512];
+    
 	if (client) {
 		while(!client.available()){
 			delay(1);
 		}
-		OSCMessage mes;
-		char packet[512];
 		//client.read((char *)packet, sizeof(long)*100);
 		decoder.decode(&mes, packet);
 		parser.patternComp(&mes);
@@ -38,16 +39,16 @@ void Gemini::monitor(){
 
 	int packetSize = udp.parsePacket();
 	if (packetSize){
-		udp.read((char *)packet, sizeof(long)*100);
+		//udp.read((char *)packet, sizeof(long)*100);
 		decoder.decode(&mes, packet);
-		parser.paternComp(&mes);
+		parser.patternComp(&mes);
 	}
 }
 
 void Gemini::sendOutput(int v){
 }
 
-int_16 Gemini::getInput(){
+int Gemini::getInput(){
 }
 
 void Gemini::sendInfo(){

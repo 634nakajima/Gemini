@@ -1,9 +1,13 @@
 #ifndef Gemini_h
 #define Gemini_h
 
-#include <ArdOSC.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include "OSCDecoder.h"
+#include "OSCEncoder.h"
+#include "OSCMessage.h"
+#include "Pattern.h"
+#include "OSCCommon.h"
 
 //tokenのosc	アドレスは，
 //（コーディネータIP）/（Geminiネーム）/（番号）
