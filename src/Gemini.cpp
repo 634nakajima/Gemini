@@ -69,7 +69,6 @@ void Gemini::sendDelTokenReq(){
 }
 
 void Gemini::addCallback(char *_adr , Pattern::AdrFunc _func){
-    parser.addOscAddress(_adr, _func);
     parser.addOscAddress("/ModuleManager/RequestML", Gemini::infoReqReceved);
     parser.addOscAddress(_adr, _func);
     parser.addOscAddress(_adr, _func);
