@@ -36,10 +36,10 @@ private:
 	OSCEncoder encoder;
 	Pattern parser;
 	int input, output;
-	void addFunc();
-	void infoReqReceved(OSCMessage *_mes);
-	void initReqReceved(OSCMessage *_mes);
-	void delReqReceved(OSCMessage *_mes);
-	void dataReceived(OSCMessage *_mes);
+	void addCallback(char *_adr, Pattern::AdrFunc _func );
+	static void infoReqReceved(OSCMessage *_mes);
+	static void initReqReceved(OSCMessage *_mes);
+	static void delReqReceved(OSCMessage *_mes);
+	static void dataReceived(OSCMessage *_mes);
 };
 #endif
