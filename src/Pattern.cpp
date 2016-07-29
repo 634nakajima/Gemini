@@ -35,13 +35,17 @@ void Pattern::addOscAddress(char *_adr ,  AdrFunc _func){
 }
 
 void Pattern::execFunc(uint8_t _index,OSCMessage *_mes){
-    adrFunc[_index](_mes);
+    adrFunc[_index](_mes, user_data);
 }
 
 void Pattern::patternComp(OSCMessage *_mes){
     
     for (uint8_t i=0 ; i<patternNum ; i++) {
-        if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 ) execFunc( i , _mes );
+        if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 && user_data != NULL) execFunc( i , _mes);
 
     }
+}
+
+void Pattern::setUserData(void *ud){
+    user_data = ud;
 }

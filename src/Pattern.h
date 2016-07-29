@@ -19,26 +19,25 @@
 
 #include "OSCMessage.h"
 
-
-
 class Pattern{
 	
 private:
     
-    typedef void (*AdrFunc)(OSCMessage*);
+    typedef void (*AdrFunc)(OSCMessage*, void *);
     
     AdrFunc adrFunc[kMaxPatternMatch];
     
 	char *addr[kMaxPatternMatch];
 
     uint8_t patternNum;
-    
+    void *user_data;
 public:
     
     Pattern();
     ~Pattern();
-                
-	void addOscAddress(char *_adr , AdrFunc _func );
+    
+    void setUserData(void *ud);
+	void addOscAddress(char *_adr , AdrFunc _func);
     void execFunc(uint8_t _index,OSCMessage *_mes);
     
     void patternComp(OSCMessage *_mes);

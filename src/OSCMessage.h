@@ -20,6 +20,7 @@
 
 #include "OSCArg.h"
 #include "OSCCommon.h"
+#include <ESP8266WiFi.h>
 
 #define kTagInt32   'i'
 #define kTagFloat   'f'
@@ -66,6 +67,7 @@ private:
 //    void get4ByteData(int16_t _index , uint8_t *_data);
 
 public:
+    IPAddress    remoteIP;
 
 	OSCMessage(void);
 	OSCMessage(const char *_oscAddr);
@@ -110,6 +112,12 @@ public:
     OSCBlob *getArgBlob(uint16_t _index) {
         return (OSCBlob *) _args[_index];
     };
+    
+    int16_t addArgBlob(const char* _value, uint8_t _byte){
+        if (_argsNum > kMaxArgument ) return -1;
+        setArgData( kTagBlob , (void*)_value , strlen(_value) , true );
+        return 1;
+    }
 #endif
 	
 	friend class Gemini;

@@ -34,9 +34,9 @@ private:
 	Pattern parser;
 	int input, output;
 	void addCallback(char *_adr, Pattern::AdrFunc _func );
-	static void infoReqReceved(OSCMessage *_mes);
-	static void initReqReceved(OSCMessage *_mes);
-	static void delReqReceved(OSCMessage *_mes);
-	static void dataReceived(OSCMessage *_mes);
+	static void infoReqReceved(OSCMessage *_mes, void *ud);
+	static void initReqReceved(OSCMessage *_mes, void *ud);
+	static void delReqReceved(OSCMessage *_mes, void *ud);
+	static void dataReceived(OSCMessage *_mes, void *ud);
 };
 #endif
