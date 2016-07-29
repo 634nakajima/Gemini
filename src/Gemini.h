@@ -19,8 +19,8 @@ public:
 	
 	void begin(const char *ssid, const char *password);
 	void monitor();
-	int addInput(const char *inAddr, int inputPin);
-	int addInput(const char *inAddr, void (*inputCallback)(int));
+	int addInput(char *inAddr, int inputPin);
+	int addInput(char *inAddr, void (*inputCallback)(int));
 	int addOutput(const char *outAddr);
 	void send(int outputID, int v);
 	int getInput();
@@ -31,7 +31,11 @@ public:
 private:
 	WiFiUDP udp;
 	WiFiClient client;
-
+    uint8_t packet[512];
+    
+    char *addr[kMaxPatternMatch];
+    uint8_t patternNum;
+    
 	OSCDecoder decoder;
 	OSCEncoder encoder;
 	Pattern parser;

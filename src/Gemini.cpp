@@ -29,39 +29,41 @@ void Gemini::begin(const char *ssid, const char *password){
 void Gemini::monitor(){
 	WiFiClient client = server.available();
     OSCMessage tmes, umes;
-    uint8_t packet[512];
     
 	if (client) {
-	  while(!client.available()){
-			delay(1);
-		}
-        int size = client.available();
-        if(size >0) {
-            for(int i=0; i<size ;i++) {
-                packet[i]  = client.read();
-            }
+        while(!client.available()){
+            delay(1);
         }
-		decoder.decode(&tmes, packet);
-		parser.patternComp(&tmes);
-  		client.flush();
+        if(client.available() >0) {
+            client.read(packet, sizeof(uint8_t)*512);
+            decoder.decode(&tmes, packet);
+            parser.patternComp(&tmes);
+        }
+        client.flush();
 	}
 
 	int packetSize = udp.parsePacket();
 	if (packetSize){
         umes.remoteIP = udp.remoteIP();
-		udp.read((char *)packet, sizeof(long)*512);
+		udp.read((uint8_t *)packet, sizeof(uint8_t)*512);
 		decoder.decode(&umes, packet);
 		parser.patternComp(&umes);
 	}
 }
 
-int Gemini::addInput(const char *inAddr, int inputPin){
-  return parser.patternNum;
+int Gemini::addInput(char *inAddr, int inputPin){
+    addr[patternNum] = inAddr;
+    patternNum++;
+    
+    return patternNum;
 }
-int Gemini::addInput(const char *inAddr, void (*inputCallback)(int)){
-  //perserにinAddrでコールバック登録
-  parser.addOscAddress((char *)inAddr, inputCallback);
-  return parser.patternNum;
+int Gemini::addInput(char *inAddr, void (*inputCallback)(int)){
+    //perserにinAddrでコールバック登録
+    addr[patternNum] = inAddr;
+    patternNum++;
+    parser.addOscAddress((char *)inAddr, inputCallback);
+    
+    return patternNum;
 }
 
 int Gemini::addOutput(const char *outAddr) {
@@ -90,9 +92,12 @@ void Gemini::addCallback(char *_adr , Pattern::AdrFunc _func){
 }
 
 void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
+    //send Module List
     Gemini *g = (Gemini *)ud;
     Serial.print("Received from ");
     Serial.println(_mes->remoteIP);
+    
+    //make a OSCMessage
     OSCMessage response;
     byte destIP[]= {_mes->remoteIP[0],_mes->remoteIP[1],_mes->remoteIP[2],_mes->remoteIP[3]};
     response.setAddress(destIP, 6341);
@@ -101,49 +106,34 @@ void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
     response.addArgString("/LED");
     response.addArgString("/Sensorvalue");
     response.addArgBlob((const char *)destIP, sizeof(destIP));
+    
+    //make binary packet
     uint8_t size = response.getMessageSize();
-    uint8_t *sendData = ( uint8_t*)calloc(size, 1);
+    uint8_t *sendData = (uint8_t*)calloc(size, 1);
     g->encoder.encode(&response, sendData);
     
+    //send packet
     WiFiClient client;
     client.connect(_mes->remoteIP, 6341);
-    for(int i=0;i<size;i++){
-        client.write(sendData[i]);
-    }
+    client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
     Serial.println(size);
 }
 
 void Gemini::initReqReceved(OSCMessage *_mes, void *ud){
+    //モジュールの生成
     Gemini *g = (Gemini *)ud;
+    WiFiClient client;
+    //client.connect("192.168.1.1", "1234");
+    uint8_t *sd = (uint8_t *)calloc(10, 1);
+    client.write((uint8_t *)sd, sizeof(uint8_t)*10);
 }
 
 void Gemini::delReqReceved(OSCMessage *_mes, void *ud){
+    //モジュールの削除
     Gemini *g = (Gemini *)ud;
 }
 
 void Gemini::dataReceived(OSCMessage *_mes, void *ud){
+    //コールバック呼び出し
     Gemini *g = (Gemini *)ud;
 }
-
-
-void Gemini::infoReqReceved(OSCMessage *_mes){
-  //モジュールリストの送信
-  sendInfo();
-}
-
-void Gemini::initReqReceved(OSCMessage *_mes){
-  //モジュールの生成
-  WiFiClient client;
-  //client.connect("192.168.1.1", "1234");
-  char *sd = (char *)calloc(10, 1);
-  client.write(sd, sizeof(sd));
-}
-
-void Gemini::delReqReceved(OSCMessage *_mes){
-  //モジュールの削除
-}
-
-void Gemini::dataReceived(OSCMessage *_mes){
-  //コールバック呼び出し
-}
-
