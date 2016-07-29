@@ -114,9 +114,17 @@ void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
     
     //send packet
     WiFiClient client;
-    client.connect(_mes->remoteIP, 6341);
-    client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
-    Serial.println(size);
+    if (!client.connect(_mes->remoteIP, 6341)) {
+        Serial.println("connection failed");
+        return;
+    }
+    int32_t size32 = (int32_t)size;
+    int32_t sizenl = htonl(size32);
+    delay(100);
+    client.println("1");
+    //client.write((uint8_t *)&size32, sizeof(int32_t));
+    //int s = client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
+    //Serial.println(s);
 }
 
 void Gemini::initReqReceved(OSCMessage *_mes, void *ud){

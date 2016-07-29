@@ -1,6 +1,11 @@
 #ifndef Gemini_h
 #define Gemini_h
 
+#define htonl(x)    ( ((x)<<24 & 0xFF000000UL) | \
+                    ((x)<< 8 & 0x00FF0000UL) | \
+                    ((x)>> 8 & 0x0000FF00UL) | \
+                    ((x)>>24 & 0x000000FFUL) )
+
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <Arduino.h>
