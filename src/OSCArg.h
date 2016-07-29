@@ -15,7 +15,7 @@
 #ifndef ArdOSC_OSCArg_h
 #define ArdOSC_OSCArg_h
 
-#include "OSCCommon.h"
+#include "OSCcommon.h"
 
 class OSCArg{
 	

@@ -24,10 +24,11 @@ class Pattern{
 private:
     
     typedef void (*AdrFunc)(OSCMessage*, void *);
+    typedef void (*inputCallback)(int);
     
     AdrFunc adrFunc[kMaxPatternMatch];
-    
-	char *addr[kMaxPatternMatch];
+    inputCallback inputCb[kMaxPatternMatch];
+    char *addr[kMaxPatternMatch];
 
     uint8_t patternNum;
     void *user_data;
@@ -38,8 +39,9 @@ public:
     
     void setUserData(void *ud);
 	void addOscAddress(char *_adr , AdrFunc _func);
+    void addOscAddress(char *_adr , inputCallback _func );
     void execFunc(uint8_t _index,OSCMessage *_mes);
-    
+    void execFunc(uint8_t _index, int v);
     void patternComp(OSCMessage *_mes);
    
     friend class Gemini;

@@ -3,12 +3,12 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <Arduino.h>
 #include "OSCDecoder.h"
 #include "OSCEncoder.h"
 #include "OSCMessage.h"
 #include "Pattern.h"
-#include "OSCCommon.h"
-
+#include "OSCcommon.h"
 //tokenのosc	アドレスは，
 //（コーディネータIP）/（Geminiネーム）/（番号）
 
@@ -19,7 +19,10 @@ public:
 	
 	void begin(const char *ssid, const char *password);
 	void monitor();
-	void sendOutput(int v);
+	int addInput(const char *inAddr, int inputPin);
+	int addInput(const char *inAddr, void (*inputCallback)(int));
+	int addOutput(const char *outAddr);
+	void send(int outputID, int v);
 	int getInput();
 	void sendInfo();
 	void sendInitTokenReq();
