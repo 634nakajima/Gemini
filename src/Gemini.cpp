@@ -93,6 +93,10 @@ void Gemini::infoReqReceved(OSCMessage *_mes){
 
 void Gemini::initReqReceved(OSCMessage *_mes){
   //モジュールの生成
+  WiFiClient client;
+  //client.connect("192.168.1.1", "1234");
+  char *sd = (char *)calloc(10, 1);
+  client.write(sd, sizeof(sd));
 }
 
 void Gemini::delReqReceved(OSCMessage *_mes){
