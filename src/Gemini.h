@@ -1,6 +1,7 @@
 #ifndef Gemini_h
 #define Gemini_h
-
+#define MAX_MODULE 10
+#define MAX_IO 4
 #define htonl(x)    ( ((x)<<24 & 0xFF000000UL) | \
                     ((x)<< 8 & 0x00FF0000UL) | \
                     ((x)>> 8 & 0x0000FF00UL) | \
@@ -14,14 +15,21 @@
 #include "OSCMessage.h"
 #include "Pattern.h"
 #include "OSCcommon.h"
-//tokenのosc	アドレスは，
-//（コーディネータIP）/（Geminiネーム）/（番号）
+
+typedef struct {
+  bool live = false;
+  int id;
+  char addRoute[64];
+  char delRoute[64];
+  char inputAddr[MAX_IO][64];
+  char outputAddr[MAX_IO][64];
+}Module;
 
 class Gemini {
 public:
 	Gemini();
 	~Gemini();
-	
+	typedef void (*inputCallback)(int);
 	void begin(char *gname, const char *ssid, const char *password);
 	void monitor();
 	int addInput(char *inAddr, int inputPin);
@@ -38,10 +46,11 @@ private:
 	WiFiClient client;
     uint8_t packet[512];
     char *geminame;
-    char *inputAddr[kMaxPatternMatch];
-    char *outputAddr[kMaxPatternMatch];
-    char arAddr[64], drAddr[64];
-    uint8_t inputNum, outputNum;
+    char *inputAddr[MAX_IO];
+    char *outputAddr[MAX_IO];
+    inputCallback inputCb[MAX_IO];
+    Module module[MAX_MODULE];
+    uint8_t inputNum, outputNum, fullInNum;
     
 	OSCDecoder decoder;
 	OSCEncoder encoder;

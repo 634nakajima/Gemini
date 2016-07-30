@@ -4,6 +4,9 @@ WiFiServer server(6341);
 
 Gemini::Gemini(){
     input = 0;
+    inputNum = 0;
+    outputNum = 0;
+    fullInNum = 0;
     parser.setUserData(this);
     parser.addOscAddress("/ModuleManager/RequestML", Gemini::infoReqReceived);
 }
@@ -61,8 +64,8 @@ int Gemini::addInput(char *inAddr, int inputPin){
 int Gemini::addInput(char *inAddr, void (*inputCallback)(int)){
     //perserにinAddrでコールバック登録
     inputAddr[inputNum] = inAddr;
+    inputCb[inputNum] = inputCallback;
     inputNum++;
-    parser.addOscAddress((char *)inAddr, inputCallback);
     
     return inputNum;
 }
@@ -156,20 +159,38 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
     char arg[5];
     _mes->getArgString(1,arg);
     strcat(p,arg);
-
+    char id[4];
+    _mes->getArgString(1,id);
+    
     if (_mes->getArgInt32(0)) {
-      strcpy(g->arAddr, p);
-      strcpy(g->drAddr, p);
-      strcat(g->arAddr, "/AddRoute");
-      strcat(g->drAddr, "/DeleteRoute");
-      g->parser.addOscAddress((char *)g->arAddr, Gemini::addRoute);
-      g->parser.addOscAddress((char *)g->drAddr, Gemini::delRoute);
- 
+      //search for free module
+      int m;
+      for(m=0;m<MAX_MODULE;m++){
+	if(!g->module[m].live) break;
+      }
+      //generate a new module
+      g->module[m].live = true;
+      g->module[m].id = int(id);
+
+      strcpy(g->module[m].addRoute, p);
+      strcat(g->module[m].addRoute, "/AddRoute");
+      g->parser.addOscAddress((char *)g->module[m].addRoute, Gemini::addRoute);
+
+      strcpy(g->module[m].delRoute, p);
+      strcat(g->module[m].delRoute, "/DeleteRoute");
+      g->parser.addOscAddress((char *)g->module[m].delRoute, Gemini::delRoute);
+
+      for(int i=0;i<g->inputNum;i++){
+	strcpy(g->module[m].inputAddr[i], p);
+	strcat(g->module[m].inputAddr[i], g->inputAddr[i]);
+	g->parser.addOscAddress(g->module[m].inputAddr[i], Gemini::dataReceived);
+      }
+
       OSCMessage response;
       response.setAddress(destIP, 6341);
       response.beginMessage("/Coordinator/SetMdtkn");
       response.addArgString(p);
-      //response.addArgInt32(atoi(_mes->getArgString(1)));
+      response.addArgInt32(int(id));
 
       //make binary packet
       uint8_t size = response.getMessageSize(); 
@@ -189,8 +210,20 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
       client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
 
     }else {
-      g->parser.delOscAddress((char *)g->arAddr);
-      g->parser.delOscAddress((char *)g->drAddr);
+      //search for the same module 
+      int m;
+      for(m=0;m<MAX_MODULE;m++){
+	if(g->module[m].id == int(id))
+	  break;
+      }
+      //delete it
+      g->module[m].live = false;
+      g->module[m].id = -1;
+      g->parser.delOscAddress(g->module[m].addRoute);
+      g->parser.delOscAddress(g->module[m].delRoute);
+      for(int i=0;i<g->inputNum;i++){
+	g->parser.delOscAddress(g->module[m].inputAddr[i]);
+      }
     }
 }
 
@@ -205,4 +238,11 @@ void Gemini::delRoute(OSCMessage *_mes, void *ud){
 void Gemini::dataReceived(OSCMessage *_mes, void *ud){
     //コールバック呼び出し
     Gemini *g = (Gemini *)ud;
+    for (uint8_t i=0 ; i<MAX_MODULE ; i++) {
+      for (uint8_t j=0 ; j<MAX_IO ; j++) {
+	if(!g->module[i].live) continue;
+	if (strcmp(g->module[i].inputAddr[j] , _mes->_oscAddress) == 0) 
+	  g->inputCb[j](_mes->getArgInt32(0));
+      }
+    }
 }
