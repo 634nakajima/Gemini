@@ -5,14 +5,15 @@ WiFiServer server(6341);
 Gemini::Gemini(){
     input = 0;
     parser.setUserData(this);
-    parser.addOscAddress("/ModuleManager/RequestML", Gemini::infoReqReceved);
+    parser.addOscAddress("/ModuleManager/RequestML", Gemini::infoReqReceived);
 }
 
 Gemini::~Gemini(){
 }
 
-void Gemini::begin(const char *ssid, const char *password){
-    
+void Gemini::begin(char *gname, const char *ssid, const char *password){
+  geminame = gname;
+  parser.addOscAddress(geminame, Gemini::moduleReqReceived);
 	WiFi.mode(WIFI_STA);
   	WiFi.begin(ssid, password);
     Serial.begin(115200);
@@ -52,21 +53,24 @@ void Gemini::monitor(){
 }
 
 int Gemini::addInput(char *inAddr, int inputPin){
-    addr[patternNum] = inAddr;
-    patternNum++;
+    inputAddr[inputNum] = inAddr;
+    inputNum++;
     
-    return patternNum;
+    return inputNum;
 }
 int Gemini::addInput(char *inAddr, void (*inputCallback)(int)){
     //perserにinAddrでコールバック登録
-    addr[patternNum] = inAddr;
-    patternNum++;
+    inputAddr[inputNum] = inAddr;
+    inputNum++;
     parser.addOscAddress((char *)inAddr, inputCallback);
     
-    return patternNum;
+    return inputNum;
 }
 
 int Gemini::addOutput(const char *outAddr) {
+  outputAddr[outputNum] = (char *)outAddr;
+  outputNum++;
+  
   return 0;
 }
 void Gemini::send(int outputID, int v){
@@ -88,10 +92,10 @@ void Gemini::sendDelTokenReq(){
 
 //addCallback関数ではコーディネータからのリクエスト受信時，及び他モジュールからのデータ受信時に呼び出されるコールバック関数を登録
 void Gemini::addCallback(char *_adr , Pattern::AdrFunc _func){
-    parser.addOscAddress("/ModuleManager/RequestML", Gemini::infoReqReceved);
+    parser.addOscAddress("/ModuleManager/RequestML", Gemini::infoReqReceived);
 }
 
-void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
+void Gemini::infoReqReceived(OSCMessage *_mes, void *ud){
     //send Module List
     Gemini *g = (Gemini *)ud;
     Serial.print("Received from ");
@@ -102,14 +106,23 @@ void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
     byte destIP[]= {_mes->remoteIP[0],_mes->remoteIP[1],_mes->remoteIP[2],_mes->remoteIP[3]};
     response.setAddress(destIP, 6341);
     response.beginMessage("/ModuleList/setMList");
-    response.addArgString("/SimpleIO");
-    response.addArgString("/LED");
-    response.addArgString("/Sensorvalue");
+    response.addArgString(g->geminame);
+
+    char inputAddrs[256], outputAddrs[256];
+    for(int i=0;i<g->inputNum;i++){
+      if(strlen(inputAddrs)+strlen(g->inputAddr[i])<128)
+	strcat(inputAddrs, g->inputAddr[i]);
+    }
+    for(int i=0;i<g->outputNum;i++){
+      if(strlen(outputAddrs)+strlen(g->outputAddr[i])<128)
+	strcat(outputAddrs, g->outputAddr[i]);
+    }
+    response.addArgString(inputAddrs);
+    response.addArgString(outputAddrs);
     response.addArgBlob((const char *)destIP, 4);
     
     //make binary packet
-    uint8_t size = response.getMessageSize();
-    
+    uint8_t size = response.getMessageSize(); 
     uint8_t *sendData = (uint8_t*)calloc(size, 1);
     g->encoder.encode(&response, sendData);
     
@@ -121,25 +134,72 @@ void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
     }
     int32_t size32 = (int32_t)size;
     int32_t sizenl = htonl(size32);
-    //client.write("1");
-    //delay(1000);
+
     client.write((uint8_t *)&sizenl, sizeof(int32_t));
-    int s = client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
-    //Serial.println(s);
+    client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
 }
 
-void Gemini::initReqReceved(OSCMessage *_mes, void *ud){
+void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
     //モジュールの生成
     Gemini *g = (Gemini *)ud;
-    WiFiClient client;
-    //client.connect("192.168.1.1", "1234");
-    uint8_t *sd = (uint8_t *)calloc(10, 1);
-    client.write((uint8_t *)sd, sizeof(uint8_t)*10);
+    char p[128];
+    for(int i=0;i<4;i++)
+      p[i] = _mes->remoteIP[3];
+
+    byte destIP[]= {_mes->remoteIP[0],
+		    _mes->remoteIP[1],
+		    _mes->remoteIP[2],
+		    _mes->remoteIP[3]};
+    p[4] = '\0';
+    strcat(p, g->geminame);
+    strcat(p, "/Node");
+    char arg[5];
+    _mes->getArgString(1,arg);
+    strcat(p,arg);
+
+    if (_mes->getArgInt32(0)) {
+      strcpy(g->arAddr, p);
+      strcpy(g->drAddr, p);
+      strcat(g->arAddr, "/AddRoute");
+      strcat(g->drAddr, "/DeleteRoute");
+      g->parser.addOscAddress((char *)g->arAddr, Gemini::addRoute);
+      g->parser.addOscAddress((char *)g->drAddr, Gemini::delRoute);
+ 
+      OSCMessage response;
+      response.setAddress(destIP, 6341);
+      response.beginMessage("/Coordinator/SetMdtkn");
+      response.addArgString(p);
+      //response.addArgInt32(atoi(_mes->getArgString(1)));
+
+      //make binary packet
+      uint8_t size = response.getMessageSize(); 
+      uint8_t *sendData = (uint8_t*)calloc(size, 1);
+      g->encoder.encode(&response, sendData);
+
+      //send packet
+      WiFiClient client;
+      if (!client.connect(_mes->remoteIP, 6341)) {
+        Serial.println("connection failed");
+        return;
+      }
+      int32_t size32 = (int32_t)size;
+      int32_t sizenl = htonl(size32);
+
+      client.write((uint8_t *)&sizenl, sizeof(int32_t));
+      client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
+
+    }else {
+      g->parser.delOscAddress((char *)g->arAddr);
+      g->parser.delOscAddress((char *)g->drAddr);
+    }
 }
 
-void Gemini::delReqReceved(OSCMessage *_mes, void *ud){
-    //モジュールの削除
-    Gemini *g = (Gemini *)ud;
+void Gemini::addRoute(OSCMessage *_mes, void *ud){
+
+}
+
+void Gemini::delRoute(OSCMessage *_mes, void *ud){
+
 }
 
 void Gemini::dataReceived(OSCMessage *_mes, void *ud){

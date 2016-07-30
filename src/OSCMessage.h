@@ -19,7 +19,7 @@
 #define OSCMessage_h
 
 #include "OSCArg.h"
-#include "OSCCommon.h"
+#include "OSCcommon.h"
 #include <ESP8266WiFi.h>
 
 #define kTagInt32   'i'

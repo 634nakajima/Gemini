@@ -22,7 +22,7 @@ public:
 	Gemini();
 	~Gemini();
 	
-	void begin(const char *ssid, const char *password);
+	void begin(char *gname, const char *ssid, const char *password);
 	void monitor();
 	int addInput(char *inAddr, int inputPin);
 	int addInput(char *inAddr, void (*inputCallback)(int));
@@ -37,18 +37,21 @@ private:
 	WiFiUDP udp;
 	WiFiClient client;
     uint8_t packet[512];
-    
-    char *addr[kMaxPatternMatch];
-    uint8_t patternNum;
+    char *geminame;
+    char *inputAddr[kMaxPatternMatch];
+    char *outputAddr[kMaxPatternMatch];
+    char arAddr[64], drAddr[64];
+    uint8_t inputNum, outputNum;
     
 	OSCDecoder decoder;
 	OSCEncoder encoder;
 	Pattern parser;
 	int input, output;
 	void addCallback(char *_adr, Pattern::AdrFunc _func );
-	static void infoReqReceved(OSCMessage *_mes, void *ud);
-	static void initReqReceved(OSCMessage *_mes, void *ud);
-	static void delReqReceved(OSCMessage *_mes, void *ud);
+	static void infoReqReceived(OSCMessage *_mes, void *ud);
+	static void moduleReqReceived(OSCMessage *_mes, void *ud);
+	static void addRoute(OSCMessage *_mes, void *ud);
+	static void delRoute(OSCMessage *_mes, void *ud);
 	static void dataReceived(OSCMessage *_mes, void *ud);
 };
 #endif

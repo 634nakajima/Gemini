@@ -39,6 +39,7 @@ public:
     
     void setUserData(void *ud);
 	void addOscAddress(char *_adr , AdrFunc _func);
+	void delOscAddress(char *adr);
     void addOscAddress(char *_adr , inputCallback _func);
     void execFunc(uint8_t _index,OSCMessage *_mes);
     void patternComp(OSCMessage *_mes);

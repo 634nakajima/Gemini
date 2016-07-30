@@ -42,6 +42,21 @@ void Pattern::addOscAddress(char *_adr, inputCallback _func){
     patternNum++;
 }
 
+void Pattern::delOscAddress(char *adr){
+  uint8_t i;
+  for (i=0 ; i<kMaxPatternMatch ; i++) {
+    if ( strcmp(addr[i] , adr ) == 0 ) {
+      adrFunc[i] = NULL;
+      inputCb[i] = NULL;
+      break;
+    }
+  }
+  for(uint8_t j=i; j<kMaxPatternMatch-1;j++){
+    adrFunc[j] = adrFunc[j+1];
+    inputCb[j] = inputCb[j+1];
+  }
+}
+
 void Pattern::execFunc(uint8_t _index, OSCMessage *_mes){
     if(inputCb[_index] == NULL)
         adrFunc[_index](_mes, user_data);
@@ -49,9 +64,8 @@ void Pattern::execFunc(uint8_t _index, OSCMessage *_mes){
         inputCb[_index](_mes->getArgInt32(0));
 }
 
-void Pattern::patternComp(OSCMessage *_mes){
-    
-    for (uint8_t i=0 ; i<patternNum ; i++) {
+void Pattern::patternComp(OSCMessage *_mes){    
+    for (uint8_t i=0 ; i<kMaxPatternMatch ; i++) {
         if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 && user_data != NULL) execFunc( i , _mes);
     }
 }
