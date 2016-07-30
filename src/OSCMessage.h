@@ -115,7 +115,7 @@ public:
     
     int16_t addArgBlob(const char* _value, uint8_t _byte){
         if (_argsNum > kMaxArgument ) return -1;
-        setArgData( kTagBlob , (void*)_value , strlen(_value) , true );
+        setArgData( kTagBlob , (void*)_value , _byte , false );
         return 1;
     }
 #endif

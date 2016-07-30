@@ -50,6 +50,7 @@ int16_t OSCEncoder::encode( OSCMessage *_newMes ,uint8_t *_binData ){
 			case kTagInt32:
             case kTagFloat:
             case kTagString:
+            case kTagBlob:
                     memcpy( packStartPtr, _newMes->_args[i]->_argData, _newMes->getArgAlignmentSize(i) );
                 break;
    

@@ -105,25 +105,26 @@ void Gemini::infoReqReceved(OSCMessage *_mes, void *ud){
     response.addArgString("/SimpleIO");
     response.addArgString("/LED");
     response.addArgString("/Sensorvalue");
-    response.addArgBlob((const char *)destIP, sizeof(destIP));
+    response.addArgBlob((const char *)destIP, 4);
     
     //make binary packet
     uint8_t size = response.getMessageSize();
+    
     uint8_t *sendData = (uint8_t*)calloc(size, 1);
     g->encoder.encode(&response, sendData);
     
     //send packet
     WiFiClient client;
-    if (!client.connect(_mes->remoteIP, 6341)) {
+    if (!client.connect(destIP, 6341)) {
         Serial.println("connection failed");
         return;
     }
     int32_t size32 = (int32_t)size;
     int32_t sizenl = htonl(size32);
-    delay(100);
-    client.println("1");
-    //client.write((uint8_t *)&size32, sizeof(int32_t));
-    //int s = client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
+    //client.write("1");
+    //delay(1000);
+    client.write((uint8_t *)&sizenl, sizeof(int32_t));
+    int s = client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
     //Serial.println(s);
 }
 
