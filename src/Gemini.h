@@ -1,11 +1,11 @@
 #ifndef Gemini_h
 #define Gemini_h
-#define MAX_MODULE 10
+#define MAX_MODULE 4
 #define MAX_IO 4
-#define htonl(x)    ( ((x)<<24 & 0xFF000000UL) | \
-                    ((x)<< 8 & 0x00FF0000UL) | \
-                    ((x)>> 8 & 0x0000FF00UL) | \
-                    ((x)>>24 & 0x000000FFUL) )
+#define htonl(x)    ( ((x)<<24 & 0xFF000000UL) |	\
+		      ((x)<< 8 & 0x00FF0000UL) |	\
+		      ((x)>> 8 & 0x0000FF00UL) |	\
+		      ((x)>>24 & 0x000000FFUL) )
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -15,52 +15,40 @@
 #include "OSCMessage.h"
 #include "Pattern.h"
 #include "OSCcommon.h"
-
-typedef struct {
-  bool live = false;
-  int id;
-  char addRoute[64];
-  char delRoute[64];
-  char inputAddr[MAX_IO][64];
-  char outputAddr[MAX_IO][64];
-}Module;
+#include "Module.h"
 
 class Gemini {
-public:
-	Gemini();
-	~Gemini();
-	typedef void (*inputCallback)(int);
-	void begin(char *gname, const char *ssid, const char *password);
-	void monitor();
-	int addInput(char *inAddr, int inputPin);
-	int addInput(char *inAddr, void (*inputCallback)(int));
-	int addOutput(const char *outAddr);
-	void send(int outputID, int v);
-	int getInput();
-	void sendInfo();
-	void sendInitTokenReq();
-	void sendDelTokenReq();
+ public:
+  Gemini();
+  ~Gemini();
+  typedef void (*inputCallback)(int);
+  void begin(char *gname, const char *ssid, const char *password);
+  void monitor();
+  int addInput(char *inAddr, int inputPin);
+  int addInput(char *inAddr, void (*inputCallback)(int));
+  int addOutput(const char *outAddr);
+  void send(int outputID, int v);
+  void sendMessageTCP(OSCMessage *m);
+  void setupModule(char *addr, int id);
+  void flushModule(int m);
 
-private:
-	WiFiUDP udp;
-	WiFiClient client;
-    uint8_t packet[512];
-    char *geminame;
-    char *inputAddr[MAX_IO];
-    char *outputAddr[MAX_IO];
-    inputCallback inputCb[MAX_IO];
-    Module module[MAX_MODULE];
-    uint8_t inputNum, outputNum, fullInNum;
+ private:
+  WiFiUDP udp;
+  uint8_t packet[512];
+  char *geminame;
+  char *inputAddr[MAX_IO];
+  char *outputAddr[MAX_IO];
+  inputCallback inputCb[MAX_IO];
+  Module module[MAX_MODULE];
+  uint8_t inputNum, outputNum;
     
-	OSCDecoder decoder;
-	OSCEncoder encoder;
-	Pattern parser;
-	int input, output;
-	void addCallback(char *_adr, Pattern::AdrFunc _func );
-	static void infoReqReceived(OSCMessage *_mes, void *ud);
-	static void moduleReqReceived(OSCMessage *_mes, void *ud);
-	static void addRoute(OSCMessage *_mes, void *ud);
-	static void delRoute(OSCMessage *_mes, void *ud);
-	static void dataReceived(OSCMessage *_mes, void *ud);
+  OSCDecoder decoder;
+  OSCEncoder encoder;
+  Pattern parser;
+  static void infoReqReceived(OSCMessage *_mes, void *ud);
+  static void moduleReqReceived(OSCMessage *_mes, void *ud);
+  static void addRoute(OSCMessage *_mes, void *ud);
+  static void delRoute(OSCMessage *_mes, void *ud);
+  static void dataReceived(OSCMessage *_mes, void *ud);
 };
 #endif
