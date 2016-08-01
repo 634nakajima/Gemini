@@ -86,8 +86,8 @@ void Gemini::infoReqReceived(OSCMessage *_mes, void *ud){
 		  _mes->remoteIP[3]};
 
   char inputAddrs[128], outputAddrs[128];
-    memset(inputAddr,'\0', 128);
-    memset(outputAddr,'\0', 128);
+    memset(inputAddrs,'\0', 128);
+    memset(outputAddrs,'\0', 128);
   for(int i=0;i<g->inputNum;i++){
     if(strlen(inputAddrs)+strlen(g->inputAddr[i])<128){
       strcat(inputAddrs, g->inputAddr[i]);
