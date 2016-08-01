@@ -18,8 +18,8 @@ void Module::setInputAddr(char **inAddr, int inNum){
   for(int i=0;i<inNum;i++){
     strcpy(inputAddr[i], mAddr);
     strcat(inputAddr[i], inAddr[i]);
-      Serial.print("input: ");
-      Serial.println(inputAddr[i]);
+	Serial.print("input: ");
+	Serial.println(inputAddr[i]);
   }
 }
 
@@ -34,12 +34,13 @@ void Module::addOutputAddr(char *ip, char *osc, int outID){
   outAddrNum[outID]++;
 }
 
-void Module::delOutputAddr(char *ip, char *osc, int outID){
+void Module::delOutputAddr(char *osc, int outID){
   int i;
   for(i=0;i<MAX_IO;i++){
     if(strcmp(outputAddr[outID][i], osc) == 0){
       memset(outputIP[outID][i], '\0', 4);
       memset(outputAddr[outID][i], '\0', 64);
+	  break;
     }
   }
   for(int j=i;j<MAX_IO-1;j++){

@@ -3,9 +3,9 @@
 #define MAX_MODULE 4
 #define MAX_IO 4
 #define htonl(x)    ( ((x)<<24 & 0xFF000000UL) |	\
-		      ((x)<< 8 & 0x00FF0000UL) |	\
-		      ((x)>> 8 & 0x0000FF00UL) |	\
-		      ((x)>>24 & 0x000000FFUL) )
+					  ((x)<< 8 & 0x00FF0000UL) |	\
+					  ((x)>> 8 & 0x0000FF00UL) |	\
+					  ((x)>>24 & 0x000000FFUL) )
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -21,7 +21,7 @@ class Gemini {
  public:
   Gemini();
   ~Gemini();
-    WiFiClient client;
+  WiFiClient client;
   typedef void (*inputCallback)(int);
   void begin(char *gname, const char *ssid, const char *password);
   void monitor();
@@ -30,13 +30,14 @@ class Gemini {
   int addOutput(const char *outAddr);
   void send(int outputID, int v);
   void sendMessageTCP(OSCMessage *m);
+  void sendMessage(OSCMessage *m);
   void setupModule(char *addr, int id);
   void flushModule(int m);
 
  private:
   WiFiUDP udp;
   uint8_t packet[512];
-    uint8_t coIP[4];
+  uint8_t coIP[4];
   char *geminame;
   char *inputAddr[MAX_IO];
   char *outputAddr[MAX_IO];
