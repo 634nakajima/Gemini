@@ -150,7 +150,7 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
   strcat(p,id);
 
   if(module_new) {//generate a new module
-    g->setupModule(p, int(id));
+    g->setupModule(p, intID);
 
     //send request to make a module token
     OSCMessage response;
@@ -162,7 +162,7 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
     Serial.println("new module!");
 
   }else {// delete the module
-    g->flushModule(int(id));
+    g->flushModule(intID);
 
 	//send request to make a module token
     OSCMessage response;
