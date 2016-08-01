@@ -10,14 +10,14 @@ int sensorID, outputID;
 void setup() {
   pinMode(LED, OUTPUT);
   
-  //name input port with pin number or callback function. 
-  gemini.addInput("/LED", LED);
-  gemini.addInput("/inputFunc", &inputFunc);
+  //name input port with callback function. 
+  gemini.addInput("/LED", &led);
+  gemini.addInput("/InputFunc", &inputFunc);
   
   //name output port.
-  //This function sets outputID in the second argument with which you will send a value.
+  //This function returns outputID with which you will send a value.
   sensorID = gemini.addOutput("/SensorValue");
-  outputID = gemini.addOutput("/outputFunc");
+  outputID = gemini.addOutput("/OutputFunc");
   
   gemini.begin("/SimpleIO", ssid, password);
 }
@@ -25,12 +25,16 @@ void setup() {
 void loop() {
   gemini.monitor();
   delay(1);
-  if(cnt++%1000 == 0){
-    gemini.send(outputID, cnt);
+  if(cnt++%100 == 0){
+    gemini.send(outputID, cnt%1000);
   }
 }
 
-void inputFunc(int val) {
-  //do something
+void led(int val) {
+  analogWrite(LED, val);
 }
 
+void inputFunc(int val) {
+  Serial.print("Input: ");
+  Serial.println(val);
+}
