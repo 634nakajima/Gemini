@@ -25,7 +25,6 @@ class Gemini {
   typedef void (*inputCallback)(int);
   void begin(char *gname, const char *ssid, const char *password);
   void monitor();
-  int addInput(char *inAddr, int inputPin);
   int addInput(char *inAddr, void (*inputCallback)(int));
   int addOutput(const char *outAddr);
   void send(int outputID, int v);

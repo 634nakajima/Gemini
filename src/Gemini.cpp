@@ -57,11 +57,6 @@ void Gemini::monitor(){
   }
 }
 
-int Gemini::addInput(char *inAddr, int inputPin){
-  inputAddr[inputNum] = inAddr;
-
-  return inputNum++;
-}
 int Gemini::addInput(char *inAddr, void (*inputCallback)(int)){
   //perserにinAddrでコールバック登録
   inputAddr[inputNum] = inAddr;
