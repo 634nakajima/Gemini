@@ -151,6 +151,7 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
 
   if(module_new) {//generate a new module
     g->setupModule(p, int(id));
+
     //send request to make a module token
     OSCMessage response;
     response.setAddress(g->coIP, 6341);
@@ -159,8 +160,17 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
     response.addArgInt32(intID);
     g->sendMessageTCP(&response);
     Serial.println("new module!");
+
   }else {// delete the module
     g->flushModule(int(id));
+
+	//send request to make a module token
+    OSCMessage response;
+    response.setAddress(g->coIP, 6341);
+    response.beginMessage("/Coordinator/DeleteMdtkn");
+    response.addArgString(p);
+    response.addArgInt32(intID);
+    g->sendMessageTCP(&response);
     Serial.println("delete module!");
   }
 }
