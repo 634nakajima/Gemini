@@ -174,7 +174,7 @@ void Gemini::sendMessageTCP(OSCMessage *m){
 
   //send packet
   WiFiClient client;
-  if (!client.connect(m->remoteIP, 6341)) {
+  if (!client.connect(m->getIpAddress(), 6341)) {
     Serial.println("connection failed");
     return;
   }
