@@ -18,6 +18,8 @@ void Module::setInputAddr(char **inAddr, int inNum){
   for(int i=0;i<inNum;i++){
     strcpy(inputAddr[i], mAddr);
     strcat(inputAddr[i], inAddr[i]);
+      Serial.print("input: ");
+      Serial.println(inputAddr[i]);
   }
 }
 

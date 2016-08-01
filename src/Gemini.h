@@ -21,6 +21,7 @@ class Gemini {
  public:
   Gemini();
   ~Gemini();
+    WiFiClient client;
   typedef void (*inputCallback)(int);
   void begin(char *gname, const char *ssid, const char *password);
   void monitor();
@@ -35,6 +36,7 @@ class Gemini {
  private:
   WiFiUDP udp;
   uint8_t packet[512];
+    uint8_t coIP[4];
   char *geminame;
   char *inputAddr[MAX_IO];
   char *outputAddr[MAX_IO];

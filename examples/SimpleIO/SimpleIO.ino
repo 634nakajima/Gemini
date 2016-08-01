@@ -19,7 +19,7 @@ void setup() {
   sensorID = gemini.addOutput("/SensorValue");
   outputID = gemini.addOutput("/outputFunc");
   
-  gemini.begin("SimpleIO", ssid, password);
+  gemini.begin("/SimpleIO", ssid, password);
 }
 
 void loop() {
