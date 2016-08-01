@@ -50,6 +50,7 @@ void Gemini::monitor(){
     udp.read((uint8_t *)packet, sizeof(uint8_t)*512);
     decoder.decode(&umes, packet);
     parser.patternComp(&umes);
+      Serial.println("!!!");
   }
 }
 

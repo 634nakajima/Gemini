@@ -50,12 +50,24 @@ void Pattern::delOscAddress(char *adr){
 
 void Pattern::execFunc(uint8_t _index, OSCMessage *_mes){
         adrFunc[_index](_mes, user_data);
+    Serial.println("!");
+
 }
 
-void Pattern::patternComp(OSCMessage *_mes){    
-    for (uint8_t i=0 ; i<kMaxPatternMatch ; i++) {
-        if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 && user_data != NULL) execFunc( i , _mes);
+void Pattern::patternComp(OSCMessage *_mes){
+    Serial.println(addr[2]);
+    if ( strcmp( addr[2] , _mes->_oscAddress ) == 0 && user_data != NULL) {
+        Serial.println(2);execFunc(2 , _mes);
     }
+    for (uint8_t i=0 ; i<kMaxPatternMatch ; i++) {
+        Serial.println(i);
+        if ( strcmp( addr[i] , _mes->_oscAddress ) == 0 && user_data != NULL) {
+            Serial.println(i);execFunc( i , _mes);
+        }
+        Serial.println(i);
+
+    }
+    Serial.println("!!");
 }
 
 void Pattern::setUserData(void *ud){
