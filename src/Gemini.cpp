@@ -273,12 +273,13 @@ void Gemini::flushModule(int id){
 
 bool Gemini::localCheck(IPAddress ip) {
   IPAddress local = WiFi.localIP();
-  Serial.println();
   if(ip[0] == local[0] &&
 	 ip[1] == local[1] &&
 	 ip[2] == local[2] &&
-	 ip[3] == local[3]) true;
-  else false;
+	 ip[3] == local[3])
+	return true;
+  else
+	return false;
 }
 
 
