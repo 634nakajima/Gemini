@@ -47,7 +47,7 @@ class Gemini {
   OSCDecoder decoder;
   OSCEncoder encoder;
   Pattern parser;
-    bool localCheck(IPAddress ip);
+  bool localCheck(IPAddress ip);
   static void infoReqReceived(OSCMessage *_mes, void *ud);
   static void moduleReqReceived(OSCMessage *_mes, void *ud);
   static void addRoute(OSCMessage *_mes, void *ud);

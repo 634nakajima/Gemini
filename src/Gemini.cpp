@@ -70,18 +70,18 @@ int Gemini::addOutput(const char *outAddr) {
 }
 
 void Gemini::send(int outputID, int v){
-    for(int i=0; i<MAX_IO;i++){
-        if(module[i].live){
-            for(int j=0;j<module[i].outAddrNum[outputID]; j++){
-                OSCMessage mes;
-                mes.remoteIP = module[i].outputIP[outputID][j];
-                mes.beginMessage(module[i].outputAddr[outputID][j]);
-                mes.addArgInt32((int32_t)v);
-                mes.addArgInt32(0);
-                sendMessage(&mes);
-            }
-        }
-    }
+  for(int i=0; i<MAX_IO;i++){
+	if(module[i].live){
+	  for(int j=0;j<module[i].outAddrNum[outputID]; j++){
+		OSCMessage mes;
+		mes.remoteIP = module[i].outputIP[outputID][j];
+		mes.beginMessage(module[i].outputAddr[outputID][j]);
+		mes.addArgInt32((int32_t)v);
+		mes.addArgInt32(0);
+		sendMessage(&mes);
+	  }
+	}
+  }
 }
 
 void Gemini::infoReqReceived(OSCMessage *_mes, void *ud){
@@ -89,8 +89,8 @@ void Gemini::infoReqReceived(OSCMessage *_mes, void *ud){
   Gemini *g = (Gemini *)ud;
 
   //make a OSCMessage
-    for(int i=0; i<4;i++)
-        g->coIP[i] = _mes->remoteIP[i];
+  for(int i=0; i<4;i++)
+	g->coIP[i] = _mes->remoteIP[i];
 
   char inputAddrs[128], outputAddrs[128];
   memset(inputAddrs,'\0', 128);
@@ -109,12 +109,12 @@ void Gemini::infoReqReceived(OSCMessage *_mes, void *ud){
     }
   }
   OSCMessage response;
-    response.remoteIP = g->coIP;
+  response.remoteIP = g->coIP;
   response.beginMessage("/ModuleList/setMList");
   response.addArgString(g->geminame);
   response.addArgString(inputAddrs);
   response.addArgString(outputAddrs);
-    byte blob[] = {10,0,1,30};
+  byte blob[] = {10,0,1,30};
   response.addArgBlob((char *)blob, 4);
   
   g->sendMessageTCP(&response);
@@ -125,7 +125,7 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
   char p[128], id[4];
   int module_new = _mes->getArgInt32(0);
   _mes->getArgString(1,id);
-    int intID = atoi(id);
+  int intID = atoi(id);
 
   //create a new module's address
   p[0] = '\0';
@@ -138,7 +138,7 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
 
     //send request to make a module token
     OSCMessage response;
-      response.remoteIP = g->coIP;
+	response.remoteIP = g->coIP;
     response.beginMessage("/Coordinator/SetMdtkn");
     response.addArgString(p);
     response.addArgInt32(intID);
@@ -149,7 +149,7 @@ void Gemini::moduleReqReceived(OSCMessage *_mes, void *ud){
 
 	//send request to make a module token
     OSCMessage response;
-      response.remoteIP = g->coIP;
+	response.remoteIP = g->coIP;
     response.beginMessage("/Coordinator/DeleteMdtkn");
     response.addArgString(p);
     response.addArgInt32(intID);
@@ -166,7 +166,7 @@ void Gemini::addRoute(OSCMessage *_mes, void *ud){
   _mes->getArgString(0,ip);
   _mes->getArgString(1,osc);
   for (uint8_t i=0 ; i<MAX_MODULE ; i++) {
-      if(!g->module[i].live) continue;
+	if(!g->module[i].live) continue;
 	if (strcmp(g->module[i].addRoute, _mes->_oscAddress)==0) {
 	  g->module[i].addOutputAddr(ip, osc, outID);
 	  break;
@@ -219,20 +219,20 @@ void Gemini::sendMessageTCP(OSCMessage *m){
 }
 
 void Gemini::sendMessage(OSCMessage *m){
-    if(localCheck(m->remoteIP)){
-        parser.patternComp(m);
-        return;
-    }
+  if(localCheck(m->remoteIP)){
+	parser.patternComp(m);
+	return;
+  }
   //make binary packet
   uint8_t size = m->getMessageSize(); 
   uint8_t *sendData = (uint8_t*)calloc(size, 1);
   encoder.encode(m, sendData);
 
   //send packe
-    udp.beginPacket(m->remoteIP, 6340);
+  udp.beginPacket(m->remoteIP, 6340);
   udp.write((uint8_t *)sendData, sizeof(uint8_t)*size);
   udp.endPacket();
-    free(sendData);
+  free(sendData);
 }
 
 void Gemini::setupModule(char *addr, int id){
@@ -263,22 +263,22 @@ void Gemini::flushModule(int id){
   }
   if(m == MAX_MODULE) return;
 
-  module[m].flush();
   parser.delOscAddress(module[m].addRoute);
   parser.delOscAddress(module[m].delRoute);
   for(int i=0;i<inputNum;i++){
     parser.delOscAddress(module[m].inputAddr[i]);
   }
+  module[m].flush();
 }
 
 bool Gemini::localCheck(IPAddress ip) {
-    IPAddress local = WiFi.localIP();
-    Serial.println();
-    if(ip[0] == local[0] &&
-       ip[1] == local[1] &&
-       ip[2] == local[2] &&
-       ip[3] == local[3]) true;
-    else false;
+  IPAddress local = WiFi.localIP();
+  Serial.println();
+  if(ip[0] == local[0] &&
+	 ip[1] == local[1] &&
+	 ip[2] == local[2] &&
+	 ip[3] == local[3]) true;
+  else false;
 }
 
 

@@ -36,14 +36,16 @@ void Pattern::addOscAddress(char *_adr, AdrFunc _func){
 
 void Pattern::delOscAddress(char *adr){
   uint8_t i;
-  for (i=0 ; i<kMaxPatternMatch ; i++) {
+  for (i=0 ; i<patternNum ; i++) {
     if ( strcmp(addr[i] , adr ) == 0 ) {
       adrFunc[i] = NULL;
+	  addr[i] = NULL;
       break;
     }
   }
-  for(uint8_t j=i; j<kMaxPatternMatch-1;j++){
+  for(uint8_t j=i; j<patternNum-1;j++){
     adrFunc[j] = adrFunc[j+1];
+	addr[j] = addr[j+1];
   }
   patternNum--;
 }
