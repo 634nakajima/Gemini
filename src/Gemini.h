@@ -36,7 +36,7 @@ class Gemini {
  private:
   WiFiUDP udp;
   uint8_t packet[512];
-  uint8_t coIP[4];
+  IPAddress coIP;
   char *geminame;
   char *inputAddr[MAX_IO];
   char *outputAddr[MAX_IO];
@@ -47,6 +47,7 @@ class Gemini {
   OSCDecoder decoder;
   OSCEncoder encoder;
   Pattern parser;
+    bool localCheck(IPAddress ip);
   static void infoReqReceived(OSCMessage *_mes, void *ud);
   static void moduleReqReceived(OSCMessage *_mes, void *ud);
   static void addRoute(OSCMessage *_mes, void *ud);

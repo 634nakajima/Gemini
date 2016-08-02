@@ -25,9 +25,10 @@ void setup() {
 void loop() {
   gemini.monitor();
   delay(1);
-  if(cnt++%100 == 0){
-    gemini.send(outputID, cnt%1000);
+  if(cnt%100 == 0){
+    gemini.send(outputID, (cnt%1100));
   }
+  cnt++;
 }
 
 void led(int val) {

@@ -3,6 +3,7 @@
 #define MAX_IO 4
 
 #include <Arduino.h>
+#include <ESP8266WiFi.h>
 
 class Module {
 public:
@@ -19,7 +20,7 @@ public:
   char delRoute[64];
   char inputAddr[MAX_IO][64];
   char outputAddr[MAX_IO][MAX_IO][64];
-  uint8_t outputIP[MAX_IO][MAX_IO][4];
+  IPAddress outputIP[MAX_IO][MAX_IO];
   int outAddrNum[MAX_IO];
   void setup(char *addr, int i);
   void setInputAddr(char **inAddr, int inNum);
