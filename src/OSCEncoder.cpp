@@ -44,14 +44,22 @@ int16_t OSCEncoder::encode( OSCMessage *_newMes ,uint8_t *_binData ){
 	
 
 	for ( uint8_t i=0 ; i < _newMes->_argsNum ; i++ ) {
-		
 		switch ( _newMes->getArgTypeTag(i) ) {
 				
 			case kTagInt32:
             case kTagFloat:
             case kTagString:
             case kTagBlob:
+            {                
+                if(_newMes->_args[i]->_dataSize != 0)
                     memcpy( packStartPtr, _newMes->_args[i]->_argData, _newMes->getArgAlignmentSize(i) );
+                else {
+                    uint8_t *arg = (uint8_t *)calloc( 1, 4 );
+                    memcpy( packStartPtr, arg, _newMes->getArgAlignmentSize(i));
+                    free(arg);
+                }
+                
+            }
                 break;
    
             default:

@@ -112,11 +112,10 @@ void Gemini::infoReqReceived(OSCMessage *_mes, void *ud){
   response.remoteIP = g->coIP;
   response.beginMessage("/ModuleList/setMList");
   response.addArgString(g->geminame);
-  response.addArgString(inputAddrs);
+    response.addArgString(inputAddrs);
   response.addArgString(outputAddrs);
   byte blob[] = {10,0,1,30};
   response.addArgBlob((char *)blob, 4);
-  
   g->sendMessageTCP(&response);
 }
 
@@ -205,7 +204,6 @@ void Gemini::sendMessageTCP(OSCMessage *m){
   uint8_t size = m->getMessageSize(); 
   uint8_t *sendData = (uint8_t*)calloc(size, 1);
   encoder.encode(m, sendData);
-
   //send packet
   WiFiClient client;
   if (!client.connect(m->remoteIP, 6341)) {
@@ -216,6 +214,7 @@ void Gemini::sendMessageTCP(OSCMessage *m){
   int32_t sizenl = htonl(size32);
   client.write((uint8_t *)&sizenl, sizeof(int32_t));
   client.write((uint8_t *)sendData, sizeof(uint8_t)*size);
+    free(sendData);
 }
 
 void Gemini::sendMessage(OSCMessage *m){

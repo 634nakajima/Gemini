@@ -41,7 +41,7 @@ OSCArg::OSCArg( char _tag , void *_data , uint16_t _size , bool _packSizeCulc ) 
     
     _typeTag = _tag;
     _dataSize = _size;
-    
+
     if( _packSizeCulc )   _alignmentSize = CULC_ALIGNMENT(_size);
     else                _alignmentSize = _size;
     
